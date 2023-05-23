@@ -1,0 +1,177 @@
+#include <iostream>
+
+template<typename T>
+class Arbol {
+private:
+    struct Nodo {
+        T elem;
+        Nodo* izq;
+        Nodo* der;
+
+        Nodo(const T& elemento) : elem(elemento), izq(nullptr), der(nullptr) {}
+    };
+
+    Nodo* raiz;
+
+public:
+    Arbol() : raiz(nullptr) {}
+
+    void inicializa() {
+        raiz = nullptr;
+    }
+
+    bool vacio() {
+        return (raiz == nullptr);
+    }
+
+    T recupera(Nodo* pos) {
+    if (raiz == nullptr || pos == nullptr) {
+        throw std::runtime_error("Error de excepción: Insuficiencia de datos");
+    }
+        return pos->elem;
+    }
+
+    void inserta(const T& elem) {
+        insertaRec(elem, raiz);
+    }
+
+    Nodo* localiza(const T& elem) {
+        return localizaRec(elem, raiz);
+    }
+
+    Nodo* menor() {
+        return menorRec(raiz);
+    }
+
+    Nodo* mayor() {
+        return mayorRec(raiz);
+    }
+
+    bool es_hoja(Nodo* pos) {
+        if (pos == nullptr) {
+            return false;
+        }
+        return (pos->izq == nullptr && pos->der == nullptr);
+    }
+
+    void recorrido_preorder() {
+        recorridoPreorderRec(raiz);
+    }
+
+    void recorrido_inorder() {
+        recorridoInorderRec(raiz);
+    }
+
+    void recorrido_postorder() {
+        recorridoPostorderRec(raiz);
+    }
+
+    void elimina(Nodo* pos) {
+        eliminaRec(pos, raiz);
+    }
+
+    int altura() {
+        return alturaRec(raiz);
+    }
+
+private:
+
+    void insertaRec(const T& elem, Nodo*& nodo) {
+        if (nodo == nullptr) {
+            nodo = new Nodo(elem);
+            } else if (elem < nodo->elem) {
+                insertaRec(elem, nodo->izq);
+            } else {
+                insertaRec(elem, nodo->der);
+        }
+    }
+
+    Nodo* localizaRec(const T& elem, Nodo* nodo) {
+        if (nodo == nullptr) {
+            return nullptr;
+        } else if (elem == nodo->elem) {
+            return nodo;
+        } else if (elem < nodo->elem) {
+            return localizaRec(elem, nodo->izq);
+        } else {
+            return localizaRec(elem, nodo->der);
+        }
+    }
+
+    Nodo* menorRec(Nodo* nodo) {
+        if (nodo == nullptr) {
+            return nullptr;
+        } else if (nodo->izq == nullptr) {
+            return nodo;
+        } else {
+            return menorRec(nodo->izq);
+        }
+    }
+
+    Nodo* mayorRec(Nodo* nodo) {
+        if (nodo == nullptr) {
+            return nullptr;
+        } else if (nodo->der == nullptr) {
+            return nodo;
+        } else {
+            return mayorRec(nodo->der);
+        }
+    }
+
+    void recorridoPreorderRec(Nodo* nodo) {
+        if (nodo == nullptr) {
+            return;
+        }
+        std::cout << nodo->elem << " ";
+        recorridoPreorderRec(nodo->izq);
+        recorridoPreorderRec(nodo->der);
+    }
+
+    void recorridoInorderRec(Nodo* nodo) {
+        if (nodo == nullptr) {
+            return;
+        }
+        recorridoInorderRec(nodo->izq);
+        std::cout << nodo->elem << " ";
+        recorridoInorderRec(nodo->der);
+    }
+
+    void recorridoPostorderRec(Nodo* nodo) {
+        if (nodo == nullptr) {
+            return;
+        }
+            recorridoPostorderRec(nodo->izq);
+            recorridoPostorderRec(nodo->der);
+            std::cout << nodo->elem << " ";
+    }
+
+    void eliminaRec(Nodo* pos, Nodo*& nodo) {
+        if (nodo == nullptr || pos == nullptr) {
+            throw std::runtime_error("Desplegar mensaje de error");
+            }
+
+            if (es_hoja(pos)) {
+                delete pos;
+                pos = nullptr;
+            } else if (pos->izq != nullptr) {
+                Nodo* pos_reemplazo = mayorRec(pos->izq);
+                pos->elem = pos_reemplazo->elem;
+                eliminaRec(pos_reemplazo, pos->izq);
+            } else {
+                Nodo* pos_reemplazo = menorRec(pos->der);
+                pos->elem = pos_reemplazo->elem;
+                eliminaRec(pos_reemplazo, pos->der);
+            }
+    }
+
+    int alturaRec(Nodo* nodo) {
+        if (nodo == nullptr) {
+            return 0;
+        }
+
+        int alt_izq = alturaRec(nodo->izq);
+        int alt_der = alturaRec(nodo->der);
+
+        return (alt_izq > alt_der) ? alt_izq + 1 : alt_der + 1;
+    }
+};
